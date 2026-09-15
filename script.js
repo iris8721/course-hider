@@ -137,12 +137,25 @@
         addToggleButtons();
     }
 
-    document.readyState === 'loading'
-        ? document.addEventListener('DOMContentLoaded', init)
-        : init();
+    let scheduled = false;
+    function scheduleInit() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(() => {
+            scheduled = false;
+            init();
+        });
+    }
 
-    new MutationObserver(init).observe(document.body, {
-        childList: true,
-        subtree: true
-    });
+    function start() {
+        init();
+        new MutationObserver(scheduleInit).observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    document.readyState === 'loading'
+        ? document.addEventListener('DOMContentLoaded', start)
+        : start();
 })();

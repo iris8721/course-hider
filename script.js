@@ -13,7 +13,14 @@
 
     let hideMarked = true;
 
-    const getHiddenCourses = () => JSON.parse(GM_getValue('hiddenCourses', '[]'));
+    const getHiddenCourses = () => {
+        try {
+            const value = JSON.parse(GM_getValue('hiddenCourses', '[]'));
+            return Array.isArray(value) ? value : [];
+        } catch (e) {
+            return [];
+        }
+    };
     const setHiddenCourses = (courses) => GM_setValue('hiddenCourses', JSON.stringify(courses));
 
     function toggleCourseHidden(orgUnitId) {
@@ -70,6 +77,8 @@
             if (!courseDiv || courseDiv.querySelector('.custom-hide-btn')) return;
 
             const orgUnitId = courseDiv.getAttribute('data-org-unit-id');
+            if (!orgUnitId) return;
+
             const isHidden = hidden.includes(orgUnitId);
 
             const hideBtn = document.createElement('button');
@@ -88,6 +97,8 @@
             const toggleContainer = courseDiv.querySelector('.d2l-button-toggle-container');
             if (toggleContainer) {
                 toggleContainer.parentElement.insertBefore(hideBtn, toggleContainer.nextSibling);
+            } else {
+                courseDiv.appendChild(hideBtn);
             }
         });
     }

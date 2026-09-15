@@ -1,7 +1,8 @@
 // ==UserScript==
-// @name         hides courses
-// @namespace    http://tampermonkey.net/
-// @description  hides courses
+// @name         MyLS Course Hider
+// @namespace    https://github.com/iris8721
+// @version      1.1.0
+// @description  Adds hide/unhide buttons to the MyLS (D2L Brightspace) course selector so old courses can be tucked away
 // @author       iris8721
 // @include      /^https:\/\/mylearningspace\..+\.ca\/.*/
 // @grant        GM_setValue

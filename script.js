@@ -23,6 +23,8 @@
     };
     const setHiddenCourses = (courses) => GM_setValue('hiddenCourses', JSON.stringify(courses));
 
+    const toggleLabel = () => hideMarked ? 'Show Hidden Courses' : 'Hide Marked Courses';
+
     function toggleCourseHidden(orgUnitId) {
         const hidden = getHiddenCourses();
         const index = hidden.indexOf(orgUnitId);
@@ -46,15 +48,16 @@
             item.style.display = (hideMarked && isHidden) ? 'none' : '';
         });
 
-        const dropdown = document.querySelector('d2l-dropdown-content');
-        const wrapper = document.querySelector('.d2l-courseselector-wrapper');
+        document.querySelectorAll('.d2l-courseselector-wrapper').forEach(wrapper => {
+            const dropdown = wrapper.closest('d2l-dropdown-content') || wrapper.querySelector('d2l-dropdown-content');
 
-        [dropdown, wrapper].forEach(el => {
-            if (el) {
-                el.style.width = 'auto';
-                el.style.minWidth = '450px';
-                el.style.maxWidth = '800px';
-            }
+            [dropdown, wrapper].forEach(el => {
+                if (el) {
+                    el.style.width = 'auto';
+                    el.style.minWidth = '450px';
+                    el.style.maxWidth = '800px';
+                }
+            });
         });
     }
 
@@ -66,6 +69,12 @@
             const isHidden = hidden.includes(orgUnitId);
             btn.textContent = isHidden ? '👁️' : '🚫';
             btn.title = isHidden ? 'Unhide course' : 'Hide course';
+        });
+    }
+
+    function updateToggleButtons() {
+        document.querySelectorAll('.custom-toggle-btn').forEach(btn => {
+            btn.textContent = toggleLabel();
         });
     }
 
@@ -103,29 +112,29 @@
         });
     }
 
-    function addToggleButton() {
-        const wrapper = document.querySelector('.d2l-courseselector-wrapper');
-        if (!wrapper || document.getElementById('custom-toggle-btn')) return;
+    function addToggleButtons() {
+        document.querySelectorAll('.d2l-courseselector-wrapper').forEach(wrapper => {
+            if (wrapper.querySelector('.custom-toggle-btn')) return;
 
-        const toggleBtn = document.createElement('button');
-        toggleBtn.id = 'custom-toggle-btn';
-        toggleBtn.textContent = hideMarked ? 'Show All Courses' : 'Show Only Marked';
-        toggleBtn.className = 'd2l-button';
-        toggleBtn.style.cssText = 'margin: 0.5rem 0.9rem; width: calc(100% - 1.8rem);';
+            const toggleBtn = document.createElement('button');
+            toggleBtn.className = 'custom-toggle-btn d2l-button';
+            toggleBtn.textContent = toggleLabel();
+            toggleBtn.style.cssText = 'margin: 0.5rem 0.9rem; width: calc(100% - 1.8rem);';
 
-        toggleBtn.addEventListener('click', () => {
-            hideMarked = !hideMarked;
-            toggleBtn.textContent = hideMarked ? 'Show All Courses' : 'Show Only Marked';
-            updateCourseVisibility();
+            toggleBtn.addEventListener('click', () => {
+                hideMarked = !hideMarked;
+                updateToggleButtons();
+                updateCourseVisibility();
+            });
+
+            wrapper.appendChild(toggleBtn);
         });
-
-        wrapper.appendChild(toggleBtn);
     }
 
     function init() {
         addHideButtons();
         updateCourseVisibility();
-        addToggleButton();
+        addToggleButtons();
     }
 
     document.readyState === 'loading'
